@@ -1,11 +1,18 @@
 Flask==0.10.1
 Flask-SQLAlchemy==1.0
+Flask-Script==2.0.5
+-e git+https://github.com/jarus/flask-testing.git#egg=Flask-Testing
 Jinja2==2.7.3
 MarkupSafe==0.23
 SQLAlchemy==0.9.6
 Werkzeug==0.9.6
+gnureadline==6.3.3
+ipython==2.1.0
 itsdangerous==0.24
 mercadopago==0.2.0
 recaptcha-client==1.0.6
 requests==2.3.0
 wsgiref==0.1.2
+mock==1.0.1
+mixer==4.7.4
+blinker==1.3
