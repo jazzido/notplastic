@@ -21,6 +21,9 @@ def ipn():
     mp = mercadopago.MP(current_app.config['MERCADOPAGO_CLIENT_ID'],
                         current_app.config['MERCADOPAGO_CLIENT_SECRET'])
 
+    # are we in sandbox mode?
+    mp.sandbox_mode(current_app.config.get('MERCADOPAGO_USE_SANDBOX', False))
+
     collection_id = request.args['id']
 
     try:
@@ -35,8 +38,9 @@ def ipn():
         db.session.add(c)
 
     status = models.CollectionStatus(status=payment_info['response']['collection']['status'],
-                                     body=json.dumps(payment_info))
-    c.statuses.append(status)
+                                     body=json.dumps(payment_info),
+                                     collection=c)
+    db.session.add(status)
 
     db.session.commit()
 

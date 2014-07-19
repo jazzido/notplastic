@@ -1,0 +1,10 @@
+<style type="text/css">{{css}}</style>
+<div id="notplastic-embed-container">
+  <strong>{{project.name}}</strong>
+  <p>Lorem ipsum dolor sit amet</p>
+  <form action="{{url_for('notplastic_site.validate_download_code', project=project.slug, _external=True)}}" method="post">
+    {{ form.csrf_token }}
+    {{ form.download_code }}
+    <input type="submit" value="Bajar" disabled="disabled">
+  </form>
+</div>

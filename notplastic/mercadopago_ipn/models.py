@@ -1,8 +1,6 @@
 from sqlalchemy.orm import relationship, foreign
 from sqlalchemy import func
 
-import sys
-
 from notplastic import db
 
 class CollectionStatus(db.Model):
@@ -16,4 +14,4 @@ class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     collection_id = db.Column(db.Text(), nullable=False)
     created_at = db.Column(db.DateTime(), default=func.now())
-    statuses = relationship(CollectionStatus)
+    statuses = relationship(CollectionStatus, backref='collection')

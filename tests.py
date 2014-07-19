@@ -1,13 +1,13 @@
 import unittest
 
-from flask import Flask
 from flask.ext.testing import TestCase
 from mixer.backend.flask import mixer
+import flask
 import mock
 import mercadopago
 
 from notplastic import create_app, db
-from notplastic import mercadopago_ipn
+from notplastic import mercadopago_ipn, notplastic_site
 
 PAYMENT_INFO = {
     'response': {u'collection': {u'amount_refunded': 0,
@@ -56,9 +56,7 @@ PAYMENT_INFO = {
     'status': 200
 }
 
-
-class MercadoPagoIPNTest(TestCase):
-
+class NPTest(TestCase):
     def create_app(self):
         self.app = create_app(
             TESTING=True,
@@ -66,7 +64,6 @@ class MercadoPagoIPNTest(TestCase):
             MERCADOPAGO_CLIENT_ID='foo',
             MERCADOPAGO_CLIENT_SECRET='bar'
         )
-#        self.app.testing = True
         mixer.init_app(self.app)
         return self.app
 
@@ -76,6 +73,50 @@ class MercadoPagoIPNTest(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all(app=self.app)
+
+
+class NotPlasticSiteTest(NPTest):
+
+    @mock.patch('notplastic.notplastic_site.views.send_file')
+    def test_valid_download_ticket(self, mock_send_file):
+        mock_send_file.return_value = self.app.make_response('')
+        p = mixer.blend(notplastic_site.models.Project,
+                        name=u'foo',
+                        file=u'bar')
+        c = mixer.blend(notplastic_site.models.DownloadCode,
+                       code=u'quux',
+                       is_download_card=True,
+                       project=p)
+        t = mixer.blend(notplastic_site.models.DownloadTicket,
+                        ticket=u'foobarquux',
+                        time_to_live=1000,
+                        download_code=c)
+
+        assert t.downloaded_at is None
+        self.client.get('/p/foo/foobarquux')
+        mock_send_file.assert_called_with(p.file, as_attachment=True)
+        assert t.downloaded_at is not None
+
+    @mock.patch('notplastic.notplastic_site.views.send_file')
+    def test_valid_download_code(self, mock_send_file):
+        mock_send_file.return_value = self.app.make_response('')
+        p = mixer.blend(notplastic_site.models.Project,
+                        name=u'foo',
+                        file=u'bar')
+        c = mixer.blend(notplastic_site.models.DownloadCode,
+                       code=u'quux',
+                       is_download_card=True,
+                       project=p)
+
+        resp = self.client.post('/p/foo/check_download_code',
+                                data=dict(download_code='quux'),
+                                follow_redirects=True)
+
+        mock_send_file.assert_called_with(p.file, as_attachment=True)
+
+
+
+class MercadoPagoIPNTest(NPTest):
 
     @mock.patch('mercadopago.MP')
     def test_ipn_new_collection(self, mock_mp):
