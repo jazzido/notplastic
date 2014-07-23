@@ -11,7 +11,7 @@
       {% endblock %}
     </div>
     {% assets filters="rjsmin", output="gen/packed.js",
-    "notplastic_site/bower_components/jquery/dist/jquery.js", "notplastic_site/js/project_landing.js" %}
+    "notplastic_site/js/jquery.min.js", "notplastic_site/js/project_landing.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
