@@ -1,0 +1,13 @@
+{% extends "project_landing_layout.html" %}
+{% block project_title %}{{ project.name }}{% endblock %}
+{% block body %}
+<div id="notplastic-download-content">
+{% if status == 'approved' %}
+<img src="{{ url_for('notplastic_site.static', filename='img/icon_download.svg') }}">
+{% elif status == 'pending' %}
+<img src="{{ url_for('notplastic_site.static', filename='img/icon_wait.svg') }}">
+{% elif status == 'rejected' %}
+<img src="{{ url_for('notplastic_site.static', filename='img/icon_rejected.svg') }}">
+{% endif %}
+</div>
+{% endblock body %}

@@ -1,0 +1,13 @@
+¡Hola!
+
+Gracias por tu compra. Este es tu código de descarga personal para
+bajar "{{project.name}}":
+
+    {{ download_code.code }}
+
+Recordá que el código te permitirá bajar el material hasta {{ download_code.max_downloads }} veces.
+Cuando quieras bajarlo otra vez, solo tenés que entrar a {{ url_for('notplastic_site.index', project=project.slug, _external=True) }} e ingresarlo.
+
+Cualquier inconveniente, podés escribirnos a este correo.
+
+Esperamos que lo disfrutes.

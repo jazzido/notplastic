@@ -1,19 +1,33 @@
 from datetime import datetime
 from urlparse import urlparse
-import os
+import os, json
 
-from flask import Blueprint, request, abort, send_file, redirect, url_for, render_template, make_response, session
+from flask import Blueprint, request, abort, send_file, redirect, url_for, render_template, make_response, session, current_app
 from flask.ext.cors import cross_origin
 
 from notplastic import db, limiter, csrf
-import models, forms
+from notplastic.mercadopago_ipn import models as mp_models
+import models, forms, signal_handlers
 
 mod = Blueprint('notplastic_site',
                 __name__,
                 url_prefix='/p',
                 template_folder='templates',
-                static_folder='static')#,
-                #static_url_path='/%s' % __name__)
+                static_folder='static')
+
+@mod.route('/<project>')
+def index(project):
+    p = db.session.query(models.Project) \
+                  .filter(models.Project.slug==project) \
+                  .first()
+    if p is None:
+        abort(404)
+
+    return render_template('project_landing.html',
+                           project=p,
+                           download_code_form=forms.DownloadCode(),
+                           payment_form=forms.Payment())
+
 
 @mod.route('/<project>/embed')
 def embed(project):
@@ -27,23 +41,17 @@ def embed(project):
     with open(os.path.join(mod.static_folder, 'css/embed.css')) as f:
         embed_css_contents = f.read()
 
-    response = make_response(render_template('embed.js',
-                                             embed_content=render_template('embed_content.html',
-                                                                           project=p,
-                                                                           form=forms.DownloadCode(),
-                                                                           css=embed_css_contents),
-                                             project=p))
-    response.headers['Content-Type'] = 'text/javascript'
-    return response
-
-@mod.route('/_sess')
-def session_init():
-    session['origin##%s' % reques.args.get('_embedGUID')] = request.args.get('_ref')
-    r = make_response('', 200)
+    r = make_response(render_template('embed.js',
+                                      embed_content=render_template('embed_content.html',
+                                                                    project=p,
+                                                                    form=forms.DownloadCode(),
+                                                                    css=embed_css_contents),
+                                      project=p))
     r.headers['Content-Type'] = 'text/javascript'
     return r
 
-@mod.route('/<project>/<ticket>')
+
+@mod.route('/<project>/dl/<ticket>')
 def download(project, ticket):
 
     p = db.session.query(models.Project) \
@@ -77,47 +85,109 @@ def download(project, ticket):
 @mod.route('/<project>/check_download_code', methods=['POST'])
 @limiter.limit('5/minute')
 def validate_download_code(project):
+    p = db.session.query(models.Project) \
+                  .filter(models.Project.slug==project) \
+                  .first()
 
-    def inner(*args, **kwargs):
-        p = db.session.query(models.Project) \
-                      .filter(models.Project.slug==project) \
-                      .first()
+    if p is None:
+        return make_response('', 404)
 
-        if p is None:
-            return make_response('', 404)
+    download_code = request.form.get('download_code')
 
-        download_code = request.form.get('download_code')
+    if download_code is None:
+        return make_response('', 400)
 
-        if download_code is None:
-            return make_response('', 400)
+    c = db.session.query(models.DownloadCode) \
+                  .filter(models.DownloadCode.project==p) \
+                  .filter(models.DownloadCode.code==download_code.lower().strip()) \
+                  .first()
 
-        c = db.session.query(models.DownloadCode) \
-                      .filter(models.DownloadCode.project==p) \
-                      .filter(models.DownloadCode.code==download_code.lower().strip()) \
-                      .first()
+    if c is None:
+        return make_response('', 404)
 
-        if c is None:
-            return make_response('', 404)
+    used_tickets = c.times_downloaded()
 
-        used_tickets = c.times_downloaded()
+    if used_tickets >= c.max_downloads:
+        make_response('', 410) # TODO: fijarse si este status code esta bien
 
-        if used_tickets >= c.max_downloads:
-            make_response('', 410) # TODO: fijarse si este status code esta bien
+    # create new ticket and redirect
+    t = models.DownloadTicket(download_code=c,
+                              ticket=models.DownloadTicket.get_unique_ticket())
+    db.session.add(t)
+    db.session.commit()
 
-        # create new ticket and redirect
-        t = models.DownloadTicket(download_code=c,
-                                  ticket=models.DownloadTicket.get_unique_ticket())
-        db.session.add(t)
+    return redirect(url_for('.download', project=p.slug, ticket=t.ticket))
+
+@mod.route('/<project>/payment', methods=['POST'])
+def payment(project):
+    p = db.session.query(models.Project) \
+                  .filter(models.Project.slug==project) \
+                  .first()
+
+    if p is None:
+        return make_response('', 404)
+
+    form = forms.Payment(request.form)
+    if not form.validate():
+        return make_response('', 400)
+
+    mppp = db.session.query(models.MercadoPagoPaymentPreference) \
+                     .filter(models.MercadoPagoPaymentPreference.project == p) \
+                     .filter(models.MercadoPagoPaymentPreference.amount == form.data['amount']) \
+                     .first()
+
+    # if no preference created for this amount, create a new one
+    if mppp is None:
+        mppp = models.MercadoPagoPaymentPreference \
+                     .save_to_mercadopago(models.MercadoPagoPaymentPreference(project=p,
+                                                                              amount=form.data['amount']))
+
+        db.session.add(mppp)
         db.session.commit()
 
-        return redirect(url_for('.download', project=p.slug, ticket=t.ticket))
+    mppp_def = json.loads(mppp.definition)
 
-    cors = cross_origin(methods=['POST'],
-                        supports_credentials=True,
-                        origins=[session.get('origin')])
-    return cors(inner)()
+    return redirect(mppp_def['init_point']
+                    if not current_app.config.get('MERCADOPAGO_USE_SANDBOX')
+                    else mppp_def['sandbox_init_point'])
 
-# @csrf.error_handler
-# def csrf_error(reason):
-#     print 'cacarulo'
-#     return 'mierda', 400
+# ?collection_id=1406045656&collection_status=approved&preference_id=37156506-29a63eda-6dd2-4100-9e48-713ff4d5760f&external_reference=null&payment_type=credit_card
+@mod.route('/<project>/payment/<status>')
+def payment_confirmation(project, status):
+    p = db.session.query(models.Project) \
+                  .filter(models.Project.slug==project) \
+                  .first()
+
+    if p is None or status not in ('success', 'failure', 'pending'):
+        return abort(404)
+
+    if db.session.query(models.MercadoPagoPaymentPreference) \
+                 .filter(models.MercadoPagoPaymentPreference.project == p) \
+                 .filter(models.MercadoPagoPaymentPreference.payment_preference_id == request.args['preference_id']) \
+                 .count() != 1:
+        abort(400)
+
+    status = request.args['collection_status']
+    template_vars = {
+        'status': status,
+        'project': project,
+        'message': ''
+    }
+
+    if status == 'approved':
+        # Check if we received an IPN notification of the successful payment
+        cs = db.session.query(mp_models.CollectionStatus) \
+                       .join(mp_models.Collection) \
+                       .filter(mp_models.Collection.collection_id == request.args['collection_id']) \
+                       .filter(mp_models.CollectionStatus.status == 'approved').first()
+
+        if cs is None:
+            template_vars['status'] = 'pending'
+
+    elif status == 'pending':
+        pass
+    elif status == 'rejected':
+        pass
+
+    return make_response(render_template('payment_confirmation.html',
+                                         **template_vars))

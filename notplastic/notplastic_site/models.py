@@ -1,18 +1,21 @@
 from datetime import timedelta, datetime
-import string, random
-import uuid
+import string, random, json, uuid
 
 from sqlalchemy.orm import relationship, foreign
 from sqlalchemy import func
 from sqlalchemy_sluggable import Sluggable
 
-from notplastic import db
+from flask import url_for, current_app
+
+from notplastic import db, utils, mercadopago_ipn
+
 
 class DownloadCode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(12), nullable=False)
     max_downloads = db.Column(db.Integer, nullable=False, default=5)
     is_download_card = db.Column(db.Boolean, default=False)
+    mercadopago_collection_id = db.Column(db.Integer, db.ForeignKey('collection.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     download_tickets = relationship('DownloadTicket', lazy='dynamic', backref='download_code')
@@ -24,6 +27,23 @@ class DownloadCode(db.Model):
 
     def times_downloaded(self):
         return self.download_tickets.filter(DownloadTicket.downloaded_at != None).count()
+
+    def __unicode__(self):
+        return self.code
+
+    @classmethod
+    def get_unique_code(cls, project, length=-1):
+        if length == -1:
+            length = current_app.config.get('DOWNLOAD_CODE_LENGTH', 6)
+        rs = lambda: ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
+        while True:
+            code = rs()
+            c = db.session.query(cls) \
+                          .filter(cls.code==code) \
+                          .filter(cls.project==project) \
+                          .count()
+            if c == 0:
+                return code
 
 class DownloadTicket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,16 +72,60 @@ class DownloadTicket(db.Model):
 class Project(db.Model, Sluggable):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text(), nullable=False)
+    description = db.Column(db.Text())
     amount = db.Column(db.Numeric(precision=2))
+    max_amount = db.Column(db.Numeric(precision=2), nullable=True)
     file = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime(), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    download_codes = relationship(DownloadCode, backref='project')
+    download_codes = relationship(DownloadCode, lazy='dynamic', backref='project')
+    mp_payment_preferences = relationship('MercadoPagoPaymentPreference', backref='project')
 
     __sluggable__ = slug_options = {
         'populate_from': 'name'
     }
+
+    def __unicode__(self):
+        return "%s" % self.name
+
+class MercadoPagoPaymentPreference(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    payment_preference_id = db.Column(db.String(50))
+    amount = db.Column(db.Numeric(precision=2))
+    definition = db.Column(db.Text())
+
+    @classmethod
+    def save_to_mercadopago(cls, payment_preference):
+        if payment_preference.definition is not None:
+            # refuse to save if not new
+            return
+
+        mp = utils.get_MP_client()
+        response = mp.create_preference({
+            'items': [
+                {
+                    'title': payment_preference.project.name,
+                    'description': payment_preference.project.description,
+                    'quantity': 1,
+                    'currency_id': 'ARS',
+                    'unit_price': payment_preference.amount,
+                }
+            ],
+            'external_reference': payment_preference.project.id,
+            'back_urls': {
+                'success': url_for('notplastic_site.payment_confirmation', project=payment_preference.project.slug, status='success', _external=True),
+                'failure': url_for('notplastic_site.payment_confirmation', project=payment_preference.project.slug, status='failure', _external=True),
+                'pending': url_for('notplastic_site.payment_confirmation', project=payment_preference.project.slug, status='pending', _external=True),
+            }
+        })
+
+        payment_preference.definition = json.dumps(response['response'])
+        payment_preference.payment_preference_id = response['response']['id']
+
+        return payment_preference
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

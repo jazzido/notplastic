@@ -8,10 +8,12 @@ class CollectionStatus(db.Model):
     collection_id = db.Column(db.Integer, db.ForeignKey('collection.id'))
     status = db.Column(db.String(64), nullable=False)
     body = db.Column(db.Text(), nullable=False)
+    created_at = db.Column(db.DateTime(), default=func.now())
 
 class Collection(db.Model):
     """ `collection` as in payment, not as an ordered set of things """
     id = db.Column(db.Integer, primary_key=True)
     collection_id = db.Column(db.Text(), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_at = db.Column(db.DateTime(), default=func.now())
     statuses = relationship(CollectionStatus, backref='collection')

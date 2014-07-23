@@ -1,0 +1,24 @@
+{
+  "name": "notplastic_site",
+  "version": "0.0.1",
+  "homepage": "https://github.com/jazzido/notplastic",
+  "authors": [
+    "Manuel Aristarán <jazzido@jazzido.com>"
+  ],
+  "description": "notplastic",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "GPL",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1.11.1"
+  }
+}

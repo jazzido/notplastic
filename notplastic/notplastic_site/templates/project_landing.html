@@ -1,0 +1,25 @@
+{% extends "project_landing_layout.html" %}
+{% block project_title %}{{ project.name }}{% endblock %}
+{% block body %}
+<div id="notplastic-download-content">
+  <h2>Código de descarga</h2>
+  <p>Lorem ipsum dolor sit amt</p>
+  <form action="{{url_for('notplastic_site.validate_download_code', project=project.slug)}}" method="post" id="notplastic-download-form">
+    {{ download_code_form.csrf_token }}
+    {{ download_code_form.download_code }}
+    <input type="submit" value="Bajar" disabled="disabled">
+  </form>
+  <h2>Comprar con MercadoPago</h2>
+  <p>Lorem ipsum dolor sit amt</p>
+  <form action="{{url_for('notplastic_site.payment', project=project.slug)}}" method="post" id="notplastic-payment-form">
+    {{ payment_form.csrf_token }}
+    {% if project.max_amount %}
+    {{ payment_form.amount(min=project.amount|int, max=project.max_amount) }}
+    {% else %}
+    {{ payment_form.amount(min=project.amount|int, max=project.amount*2) }}
+    {% endif %}
+    <output name="total_amount" for="amount"></output>
+    <input type="submit" value="Comprar">
+  </form>
+</div>
+{% endblock %}

@@ -74,8 +74,14 @@
     //your widget code goes here
     jQuery(document).ready(function ($) {
       //loadCss("{{url_for('notplastic_site.static', filename='css/embed.css', _external=True)}}");
-      loadScript("{{url_for('notplastic_site.session_init', _external=True)}}" + "?_ref=" + encodeURIComponent(window.location.origin) + "&_embedGUID=" + encodeURIComponent(embedGUID),
-        function() {
+      jQuery.ajax({
+        url: "{{url_for('notplastic_site.session_init', _external=True)}}" + "?_ref=" + encodeURIComponent(window.location.origin) + "&_embedGUID=" + encodeURIComponent(embedGUID),
+        xhrFields: {
+          withCredentials: true
+        },
+        crossDomain: true,
+        type: 'get'
+      }).done(function() {
         jQuery(scriptTag).after(EMBED_CONTENT);
         jQuery('#notplastic-embed-container form input[name=download_code]')
           .on('input',
@@ -93,7 +99,7 @@
 
           jQuery
             .ajax({
-              url: jQuery(this).attr('action'),
+              url: jQuery(this).attr('action') + '?_embedGUID=' + embedGUID,
               data: jQuery(this).serialize(),
               xhrFields: {
                 withCredentials: true
@@ -118,12 +124,9 @@
               }
             })
             .always(function(data) {
-            console.log(data);
           });
         });
       });
-      //example script load
-      //loadScript("http://example.com/anotherscript.js", function() { /* loaded */ });
     });
   }
 })();

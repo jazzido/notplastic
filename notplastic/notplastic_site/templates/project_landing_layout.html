@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{% block project_title %}{% endblock %} — unabanda.cc</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('notplastic_site.static', filename='css/project_landing.css') }}">
+  </head>
+  <body>
+    <div id="container">
+      {% block body %}
+      {% endblock %}
+    </div>
+    {% assets filters="rjsmin", output="gen/packed.js",
+    "notplastic_site/bower_components/jquery/dist/jquery.js", "notplastic_site/js/project_landing.js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+
+  </body>
+</html>
