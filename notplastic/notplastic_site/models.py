@@ -73,8 +73,11 @@ class Project(db.Model, Sluggable):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text(), nullable=False)
     description = db.Column(db.Text())
+    extended_description = db.Column(db.Text())
     amount = db.Column(db.Numeric(precision=2))
     max_amount = db.Column(db.Numeric(precision=2), nullable=True)
+    suggested_amount = db.Column(db.Numeric(precision=2), nullable=True)
+    max_downloads = db.Column(db.Integer, nullable=False, default=5)
     file = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime(), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -88,6 +91,10 @@ class Project(db.Model, Sluggable):
 
     def __unicode__(self):
         return "%s" % self.name
+
+    @property
+    def is_variable_price(self):
+        return self.max_amount is not None
 
 class MercadoPagoPaymentPreference(db.Model):
     id = db.Column(db.Integer, primary_key=True)

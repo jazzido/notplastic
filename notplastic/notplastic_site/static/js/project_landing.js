@@ -6,6 +6,7 @@ window.mercadopago_callback = function(transaction_result) {
 };
 
 $(function() {
+
   $('#notplastic-download-form input[name=download_code]')
     .on('input',
       function() {
@@ -15,15 +16,19 @@ $(function() {
             $(this).val().length < 6);
       });
 
-  $('#notplastic-payment-form input[name=amount]').on('input',
-    function() {
-      console.log(      $(this)
-        .siblings('output'));
+  var sliderInputHandler = function() {
       $(this)
         .siblings('output')
         .val($(this).val());
+  };
 
-    });
+  $('#notplastic-payment-form input[name=amount]').on('input',
+    sliderInputHandler);
+
+  $.proxy(sliderInputHandler, $('#notplastic-payment-form input[name=amount]').get(0))();
+
+
+
 
 
 });

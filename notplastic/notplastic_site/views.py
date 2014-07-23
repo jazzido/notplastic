@@ -79,8 +79,9 @@ def download(project, ticket):
     db.session.add(t)
     db.session.commit()
 
-    # TODO: corregir path del send_file
-    return send_file(p.file, as_attachment=True)
+    return send_file(os.path.join(current_app.config['PROJECT_FILES_PATH'],
+                                  p.file),
+                     as_attachment=True)
 
 @mod.route('/<project>/check_download_code', methods=['POST'])
 @limiter.limit('5/minute')
@@ -128,19 +129,22 @@ def payment(project):
         return make_response('', 404)
 
     form = forms.Payment(request.form)
-    if not form.validate():
-        return make_response('', 400)
+
+    amount = form.data['amount'] if p.is_variable_price else int(p.amount)
+
+    # if not form.validate():
+    #     return make_response('', 400)
 
     mppp = db.session.query(models.MercadoPagoPaymentPreference) \
                      .filter(models.MercadoPagoPaymentPreference.project == p) \
-                     .filter(models.MercadoPagoPaymentPreference.amount == form.data['amount']) \
+                     .filter(models.MercadoPagoPaymentPreference.amount == amount) \
                      .first()
 
     # if no preference created for this amount, create a new one
     if mppp is None:
         mppp = models.MercadoPagoPaymentPreference \
                      .save_to_mercadopago(models.MercadoPagoPaymentPreference(project=p,
-                                                                              amount=form.data['amount']))
+                                                                              amount=amount))
 
         db.session.add(mppp)
         db.session.commit()
@@ -151,7 +155,7 @@ def payment(project):
                     if not current_app.config.get('MERCADOPAGO_USE_SANDBOX')
                     else mppp_def['sandbox_init_point'])
 
-# ?collection_id=1406045656&collection_status=approved&preference_id=37156506-29a63eda-6dd2-4100-9e48-713ff4d5760f&external_reference=null&payment_type=credit_card
+# http://dev.local.unabanda.cc:5000/p/el-abrigo-del-viento/payment/pending?collection_id=1406141035&collection_status=pending&preference_id=163048080-833a476d-9dd4-430e-b5a1-235fb65ddb39&external_reference=1&payment_type=credit_card
 @mod.route('/<project>/payment/<status>')
 def payment_confirmation(project, status):
     p = db.session.query(models.Project) \
@@ -167,26 +171,37 @@ def payment_confirmation(project, status):
                  .count() != 1:
         abort(400)
 
-    status = request.args['collection_status']
     template_vars = {
         'status': status,
-        'project': project,
-        'message': ''
+        'project': p,
+        'message': '',
     }
 
-    if status == 'approved':
+    if status == 'success':
         # Check if we received an IPN notification of the successful payment
         cs = db.session.query(mp_models.CollectionStatus) \
                        .join(mp_models.Collection) \
                        .filter(mp_models.Collection.collection_id == request.args['collection_id']) \
                        .filter(mp_models.CollectionStatus.status == 'approved').first()
 
-        if cs is None:
-            template_vars['status'] = 'pending'
+        if cs is not None:
+            download_code = db.session.query(models.DownloadCode) \
+                                      .filter(models.DownloadCode.mercadopago_collection_id==cs.collection.id) \
+                                      .first()
+            template_vars.update({
+                'download_code': download_code,
+            })
+        else:
+            # MP reports payment approved (or user trying to forge the query string)
+            # but we didn't receive the IPN yet, force 'pending' state.
+            template_vars.update({
+                'status': 'pending',
+                'collection_id': request.args.get('collection_id')
+            })
 
     elif status == 'pending':
-        pass
-    elif status == 'rejected':
+        template_vars['collection_id'] = request.args.get('collection_id')
+    elif status == 'failure':
         pass
 
     return make_response(render_template('payment_confirmation.html',

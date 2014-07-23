@@ -324,6 +324,7 @@ class IntegrationTest(NPTest):
                          body=json.dumps(PAYMENT_INFO_APPROVED))
 
         assert db.session.query(notplastic_site.models.DownloadCode).count() == 0
+        assert c.email_sent_at is None
 
         with mail.record_messages() as outbox:
             notplastic_site.signal_handlers.ipn_received(self.app, c)
@@ -333,11 +334,9 @@ class IntegrationTest(NPTest):
             assert q.count() == 1
             dc = q.first()
 
-            print dc.code
-
             assert dc.code in outbox[0].body
-
-            #assert dc.code in outbox[0].body
+            assert c.email_sent_at is not None
+            assert outbox[0].recipients[0] == cs.payer_email
 
 
 

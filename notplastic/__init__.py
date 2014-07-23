@@ -6,8 +6,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
 from flask.ext.assets import Environment
 from flask.ext.superadmin import Admin
+from flask.ext.superadmin.contrib.fileadmin import FileAdmin
 from flask_limiter import Limiter
 from flask_wtf.csrf import CsrfProtect
+from flaskext.markdown import Markdown
 
 DEV_CONFIG = {
     'SQLALCHEMY_DATABASE_URI': 'sqlite:///%s/notplastic.db' % os.path.abspath(os.path.dirname(__file__)),
@@ -17,7 +19,9 @@ DEV_CONFIG = {
     'MERCADOPAGO_USE_SANDBOX': True,
     'SERVER_NAME': 'dev.local.unabanda.cc:5000',
     'DEFAULT_MAIL_SENDER': 'testing@unabanda.cc',
-    'DOWNLOAD_CODE_LENGTH': 6
+    'DOWNLOAD_CODE_LENGTH': 6,
+    'DEV': True,
+    'PROJECT_FILES_PATH': os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project_files')
 }
 
 db = SQLAlchemy()
@@ -36,6 +40,8 @@ def create_app(**config):
     assets_env.init_app(app)
     csrf.init_app(app)
 
+    Markdown(app)
+
     create_admin(app)
 
     from notplastic.mercadopago_ipn.views import mod as mp_views
@@ -50,3 +56,4 @@ def create_admin(app):
     from notplastic.notplastic_site import models as np_models
     admin.register(np_models.User, session=db.session)
     admin.register(np_models.Project, session=db.session)
+    admin.add_view(FileAdmin(app.config['PROJECT_FILES_PATH'], 'project_files', name='Project Files'))

@@ -1,5 +1,6 @@
 # coding: utf-8
-import json, os
+import os
+from datetime import datetime
 
 from flask import render_template_string
 from flask.ext.mail import Message
@@ -14,25 +15,28 @@ def ipn_received(app, collection):
                    .order_by(mercadopago_ipn.models.CollectionStatus.created_at.desc()) \
                    .first()
 
-    if cs is None or cs.status != 'approved':
+    if cs is None or cs.status != 'approved' or collection.email_sent_at is not None:
         return
 
     project = db.session.query(notplastic_site.models.Project) \
-              .filter(notplastic_site.models.Project.id == cs.collection.project_id) \
+              .filter(notplastic_site.models.Project.id == collection.project_id) \
               .first()
 
     if project is None:
         abort(500)
 
-    rcpt = json.loads(cs.body)['response']['collection']['payer']['email']
+    rcpt = cs.payer_email
 
     # generate a download code
     download_code = notplastic_site.models.DownloadCode(
         code=notplastic_site.models.DownloadCode.get_unique_code(project),
-        mercadopago_collection_id=cs.collection.id,
-        project=project)
+        max_downloads=project.max_downloads,
+        mercadopago_collection_id=collection.id,
+        project=project
+    )
 
     db.session.add(download_code)
+
     db.session.commit()
 
     templ_path = os.path.join(notplastic_site.views.mod.root_path,
@@ -46,11 +50,19 @@ def ipn_received(app, collection):
                                           download_code=download_code)
 
 
+    collection.email_sent_at = datetime.now()
+
     msg = Message(subject=u"Tu código de descarga para %s!" % project.name,
                   recipients=[rcpt],
                   body=msg_body,
                   sender=(app.config['DEFAULT_MAIL_SENDER'], app.config['DEFAULT_MAIL_SENDER']))
 
-    mail.send(msg)
+    if not app.config.get('DEV'):
+        mail.send(msg)
+    else:
+        print "SENDING MAIL: %s" % msg
+
+
+
 
 signal_ipn_received.connect(ipn_received)
