@@ -4,8 +4,8 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.collect import Collect
 
-from notplastic import create_app, db, DEV_CONFIG
-from notplastic.notplastic_site.commands import NotPlasticCommand, collect
+from notplastic import create_app, db, DEV_CONFIG, collect
+from notplastic.notplastic_site.commands import NotPlasticCommand
 conf = {}
 if not os.environ.get('PROD'):
     ##### THIS IS FOR DEV ENVIRONMENT

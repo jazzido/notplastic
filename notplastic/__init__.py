@@ -11,6 +11,7 @@ from flask_limiter import Limiter
 from flask_wtf.csrf import CsrfProtect
 from flask.ext.collect import Collect
 from flaskext.markdown import Markdown
+from flask.ext.cdn import CDN
 
 DEV_CONFIG = {
     'SQLALCHEMY_DATABASE_URI': 'sqlite:///%s/notplastic.db' % os.path.abspath(os.path.dirname(__file__)),
@@ -31,6 +32,7 @@ mail = Mail()
 csrf = CsrfProtect()
 assets_env = Environment()
 collect = Collect()
+cdn = CDN()
 
 def create_app(**config):
     app = Flask(__name__, static_url_path='')
@@ -41,7 +43,8 @@ def create_app(**config):
     mail.init_app(app)
     assets_env.init_app(app)
     csrf.init_app(app)
-    collect.init_app(app)
+#    collect.init_app(app)
+    cdn.init_app(app)
 
     Markdown(app)
 
