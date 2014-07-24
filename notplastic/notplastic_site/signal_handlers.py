@@ -57,12 +57,10 @@ def ipn_received(app, collection):
                   body=msg_body,
                   sender=(app.config['DEFAULT_MAIL_SENDER'], app.config['DEFAULT_MAIL_SENDER']))
 
-    if not app.config.get('DEV'):
+    if not app.debug:
         mail.send(msg)
     else:
         print "SENDING MAIL: %s" % msg
-
-
 
 
 signal_ipn_received.connect(ipn_received)
