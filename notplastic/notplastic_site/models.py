@@ -13,7 +13,7 @@ from notplastic import db, utils, mercadopago_ipn
 class DownloadCode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(12), nullable=False)
-    max_downloads = db.Column(db.Integer, nullable=False, default=5)
+    max_downloads = db.Column(db.Integer, default=5)
     is_download_card = db.Column(db.Boolean, default=False)
     mercadopago_collection_id = db.Column(db.Integer, db.ForeignKey('collection.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
@@ -79,6 +79,7 @@ class Project(db.Model, Sluggable):
     suggested_amount = db.Column(db.Numeric(precision=2), nullable=True)
     max_downloads = db.Column(db.Integer, nullable=False, default=5)
     file = db.Column(db.String(255), nullable=False)
+    background_image_url = db.Column(db.String(512), nullable=True)
     created_at = db.Column(db.DateTime(), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 

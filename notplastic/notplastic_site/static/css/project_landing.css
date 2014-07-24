@@ -34,9 +34,10 @@ html,body {
   width: 50%;
   border:1px solid #000;
   font-family: 'Roboto', sans-serif;
-  background-color: rgba(218,218,218,0.6);
   color: #222222;
   padding: 10px;
+  background-color: rgba(218, 218, 218, 0.8);
+  box-shadow: 0px 0px 8px rgba(0, 0, 3, 0.9);
 }
 
 
