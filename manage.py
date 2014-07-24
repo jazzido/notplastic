@@ -3,6 +3,7 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 from notplastic import create_app, db, DEV_CONFIG
+from notplastic.notplastic_site.commands import NotPlasticCommand
 
 ##### THIS IS FOR DEV ENVIRONMENT
 from notplastic.mp_creds import MP_CREDS
@@ -16,6 +17,7 @@ migrate = Migrate(app, db)
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+manager.add_command('notplastic', NotPlasticCommand)
 
 @manager.command
 def list_routes():
