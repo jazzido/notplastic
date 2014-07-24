@@ -9,6 +9,7 @@ from flask.ext.superadmin import Admin
 from flask.ext.superadmin.contrib.fileadmin import FileAdmin
 from flask_limiter import Limiter
 from flask_wtf.csrf import CsrfProtect
+from flask.ext.collect import Collect
 from flaskext.markdown import Markdown
 
 DEV_CONFIG = {
@@ -29,6 +30,7 @@ limiter = Limiter()
 mail = Mail()
 csrf = CsrfProtect()
 assets_env = Environment()
+collect = Collect()
 
 def create_app(**config):
     app = Flask(__name__, static_url_path='')
@@ -39,6 +41,7 @@ def create_app(**config):
     mail.init_app(app)
     assets_env.init_app(app)
     csrf.init_app(app)
+    collect.init_app(app)
 
     Markdown(app)
 

@@ -2,10 +2,10 @@ import os
 from flask import url_for
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
+from flask.ext.collect import Collect
 
 from notplastic import create_app, db, DEV_CONFIG
-from notplastic.notplastic_site.commands import NotPlasticCommand
-
+from notplastic.notplastic_site.commands import NotPlasticCommand, collect
 conf = {}
 if not os.environ.get('PROD'):
     ##### THIS IS FOR DEV ENVIRONMENT
@@ -24,6 +24,9 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 manager.add_command('notplastic', NotPlasticCommand)
+
+if not os.environ.get('PROD') is None:
+    collect.init_script(manager)
 
 @manager.command
 def list_routes():

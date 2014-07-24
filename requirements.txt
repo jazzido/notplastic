@@ -26,3 +26,4 @@ Flask-Migrate==1.2.0
 -e git+https://github.com/SyrusAkbary/Flask-SuperAdmin.git#egg=Flask-SuperAdmin
 Flask-Markdown==0.3
 Markdown==2.4.1
+Flask-Collect==0.2.3
