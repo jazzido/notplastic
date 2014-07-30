@@ -24,6 +24,14 @@
     "notplastic_site/js/jquery.min.js", "notplastic_site/js/project_landing.js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
-
+    <script src="https://cdn.auth0.com/w2/auth0-widget-5.0.min.js"></script>
+    <script type="text/javascript">
+      var widget = new Auth0Widget({
+          domain:         '{{ config['AUTH0_DOMAIN']}}',
+          clientID:       '{{ config['AUTH0_CLIENT_ID']}}',
+          callbackURL:    '{{ url_for('auth0.callback', _external=True) }}'
+      });
+    </script>
+    <!-- button onclick="widget.signin({ scope: 'openid profile' })">Login</button -->
   </body>
 </html>
