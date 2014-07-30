@@ -17,7 +17,7 @@ else:
     conf = prod_config.PROD_CONFIG
 
 app = create_app(**conf)
-app.debug = not os.environ.get('PROD') is None
+app.debug = os.environ.get('PROD') is None
 
 migrate = Migrate(app, db)
 
@@ -25,7 +25,7 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 manager.add_command('notplastic', NotPlasticCommand)
 
-if not os.environ.get('PROD') is None:
+if not app.debug:
     collect.init_script(manager)
 
 @manager.command

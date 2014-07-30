@@ -31,15 +31,25 @@ html,body {
 }
 
 #notplastic-download-content {
-  width: 50%;
+  width: 60%;
   border:1px solid #000;
   font-family: 'Roboto', sans-serif;
-  color: #222222;
+  color: #333;
   padding: 10px;
   background-color: rgba(218, 218, 218, 0.8);
   box-shadow: 0px 0px 8px rgba(0, 0, 3, 0.9);
+  margin-top: 10px; margin-bottom: 10px;
 }
 
+@media (max-width: 800px) {
+  #notplastic-download-content {
+    width: 90%;
+  }
+}
+
+  #notplastic-download-content h1 {
+    font-size: 2.8em;
+  }
 
   #notplastic-download-content object.confirmation-icon {
     width: 30%;
@@ -80,7 +90,8 @@ form#notplastic-payment-form {
 
   form#notplastic-payment-form output[name=total_amount] {
     display: inline-block;
-    width: 12%;
+    width: 17%;
+    white-space: nowrap;
     background-color: #333;
     padding: 1%;
     color: white;
@@ -124,6 +135,10 @@ form#notplastic-payment-form {
     text-shadow:0px 1px 0px #3d768a;
     display: block;
     margin: 0 auto;
+    background-image: url('/p/static/img/MP-payButton-logos.png');
+    background-repeat: no-repeat;
+    background-position: center 91%;
+    background-size: 90%;
   }
     form#notplastic-payment-form input[type=submit]:hover {
 	background-color:#408c99;

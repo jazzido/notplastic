@@ -8,7 +8,15 @@
   <hr>
   <h2>Comprar con MercadoPago</h2>
   {% if project.is_variable_price %}
+  {% if project.suggested_amount %}
+  {% if project.suggested_amount != project.amount %}
+  {% set suggested = project.suggested_amount %}
+  <p>El precio sugerido es de <strong class="amount">$ {{ project.suggested_amount|int }} (pesos argentinos)</strong>, pero también podés obtener tu descarga aportando desde <strong class="amount">$ {{ project.amount|int }} </strong> hasta <strong class="amount">$ {{ project.max_amount|int }} </strong>.</p>
+  {% else %}
+  {% set suggested = project.amount %}
   <p>Por un mínimo de <strong class="amount">$ {{ project.amount|int }} (pesos argentinos)</strong>, podés descargar <em>{{ project.name }}</em>. Si querés apoyar nuestro proyecto, podés colaborar con hasta <strong class="max-amount">$ {{ project.max_amount|int }}</strong></p>
+  {% endif %}
+  {% endif %}
   {% else %}
   <p>Por <strong class="precio">$ {{ project.amount|int }} (pesos argentinos)</strong>, podés descargar <em>{{ project.name }}</em>.</p>
   {% endif %}
@@ -16,11 +24,6 @@
   <form action="{{url_for('notplastic_site.payment', project=project.slug)}}" method="post" id="notplastic-payment-form">
     {{ payment_form.csrf_token }}
     {% if project.is_variable_price %}
-    {% if project.suggested_amount %}
-    {% set suggested = project.suggested_amount %}
-    {% else %}
-    {% set suggested = project.amount %}
-    {% endif %}
     {% if project.max_amount %}
     {{ payment_form.amount(min=project.amount|int, max=project.max_amount, value=suggested|int) }}
     {% else %}

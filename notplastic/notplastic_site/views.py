@@ -29,28 +29,6 @@ def index(project):
                            payment_form=forms.Payment())
 
 
-@mod.route('/<project>/embed')
-def embed(project):
-    p = db.session.query(models.Project) \
-                  .filter(models.Project.slug==project) \
-                  .first()
-    if p is None:
-        abort(404)
-
-    embed_css_contents = ''
-    with open(os.path.join(mod.static_folder, 'css/embed.css')) as f:
-        embed_css_contents = f.read()
-
-    r = make_response(render_template('embed.js',
-                                      embed_content=render_template('embed_content.html',
-                                                                    project=p,
-                                                                    form=forms.DownloadCode(),
-                                                                    css=embed_css_contents),
-                                      project=p))
-    r.headers['Content-Type'] = 'text/javascript'
-    return r
-
-
 @mod.route('/<project>/dl/<ticket>')
 def download(project, ticket):
 
@@ -206,3 +184,24 @@ def payment_confirmation(project, status):
 
     return make_response(render_template('payment_confirmation.html',
                                          **template_vars))
+
+# @mod.route('/<project>/embed')
+# def embed(project):
+#     p = db.session.query(models.Project) \
+#                   .filter(models.Project.slug==project) \
+#                   .first()
+#     if p is None:
+#         abort(404)
+
+#     embed_css_contents = ''
+#     with open(os.path.join(mod.static_folder, 'css/embed.css')) as f:
+#         embed_css_contents = f.read()
+
+#     r = make_response(render_template('embed.js',
+#                                       embed_content=render_template('embed_content.html',
+#                                                                     project=p,
+#                                                                     form=forms.DownloadCode(),
+#                                                                     css=embed_css_contents),
+#                                       project=p))
+#     r.headers['Content-Type'] = 'text/javascript'
+#     return r

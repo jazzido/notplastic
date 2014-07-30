@@ -13,17 +13,25 @@ from flask.ext.collect import Collect
 from flaskext.markdown import Markdown
 from flask.ext.cdn import CDN
 
+DEV_SERVER_NAME = 'dev.local.unabanda.cc:5000'
+
 DEV_CONFIG = {
     'SQLALCHEMY_DATABASE_URI': 'sqlite:///%s/notplastic.db' % os.path.abspath(os.path.dirname(__file__)),
     'SQLALCHEMY_ECHO': True,
     'SECRET_KEY': 'this is not secure, please set a real key when deploying',
     'SESSION_COOKIE_HTTPONLY': False,
     'MERCADOPAGO_USE_SANDBOX': True,
-    'SERVER_NAME': 'dev.local.unabanda.cc:5000',
+    'SERVER_NAME': DEV_SERVER_NAME,
     'DEFAULT_MAIL_SENDER': 'testing@unabanda.cc',
     'DOWNLOAD_CODE_LENGTH': 6,
     'DEV': True,
-    'PROJECT_FILES_PATH': os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project_files')
+    'PROJECT_FILES_PATH': os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project_files'),
+    'CDN_DOMAIN': DEV_SERVER_NAME,
+    'CDN_DEBUG': True,
+    'AUTH0_CLIENT_ID': 'HJl2RIXuBq1022WWqZzJobGZDhw1ciW8',
+    'AUTH0_CLIENT_SECRET': 'MMuSbWVL3_PqrDGS-Uamu6_K-G-_Y3osqMrztdtXw_rVxOTR9vlolyjEtJsGigS1',
+    'AUTH0_DOMAIN': 'unabanda.auth0.com',
+    'AUTH0_CALLBACK_URL': 'http://%s/auth0/callback' % DEV_SERVER_NAME
 }
 
 db = SQLAlchemy()
@@ -44,7 +52,7 @@ def create_app(**config):
     assets_env.init_app(app)
     csrf.init_app(app)
 #    collect.init_app(app)
-    cdn.init_app(app)
+    #cdn.init_app(app)
 
     Markdown(app)
 
@@ -52,8 +60,11 @@ def create_app(**config):
 
     from notplastic.mercadopago_ipn.views import mod as mp_views
     from notplastic.notplastic_site.views import mod as nps_views
+    from notplastic.auth0.views import mod as auth0_views
     app.register_blueprint(mp_views)
     app.register_blueprint(nps_views)
+    app.register_blueprint(auth0_views)
+
 
     return app
 
