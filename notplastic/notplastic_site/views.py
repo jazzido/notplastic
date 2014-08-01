@@ -50,7 +50,7 @@ def download(project, ticket):
 
 
     if (t is None) or (t.downloaded_at is not None) or t.has_expired():
-        abort(404)
+        abort(410)
 
     t.downloaded_at = datetime.now()
 
