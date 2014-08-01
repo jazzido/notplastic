@@ -62,5 +62,9 @@ def ipn_received(app, collection):
     else:
         print "SENDING MAIL: %s" % msg
 
+    db.session.add(collection)
+
+    db.session.commit()
+
 
 signal_ipn_received.connect(ipn_received)
