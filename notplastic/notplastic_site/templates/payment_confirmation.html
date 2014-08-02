@@ -20,7 +20,7 @@
   {% elif status == 'pending' %}
   <h1>Esperando</h1>
   <p>Estamos esperando que <em>MercadoPago</em> nos confirme la recepción de tu pago. Si pagaste con tarjeta de crédito o mediante tu cuenta de <em>MercadoPago</em>, vas a recibir por email un código de descarga por email en los próximos minutos. Si elegiste pagar con un cupón o por cajero automático, recibirás tu código cuando completes la operación.</p>
-  <p>Si no recibís el código, por favor escribinos a <strong>compras@unabanda.cc</strong>{% if collection_id and collection_id != 'null' %} mencionando el código de operación {{ collection_id }} {% endif %}.<em>
+  <p>Si no recibís el código, por favor escribinos a <strong>compras@unabanda.cc</strong>{% if collection_id and collection_id != 'null' %} mencionando el código de operación {{ collection_id }} {% endif %}.
   {% elif status == 'failure' %}
     <h1>Hubo un error</h1>
   {% endif %}
