@@ -11,7 +11,7 @@ html,body {
 #container {
   width: 100%;
   min-height: 100%;
-  background-color: green;
+  background-color: white;
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
@@ -147,3 +147,21 @@ form#notplastic-payment-form {
 	position:relative;
 	top:1px;
     }
+
+#unabanda-logo {
+  display: block;
+  position: absolute; z-index: 42;
+  padding: 5px;
+  width: 100px; 
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  top: 0%; right: 0%;
+  background-color: rgba(255,255,255,1);
+  color: #333;
+  opacity: 0.4;
+  text-decoration: none;
+}
+
+  #unabanda-logo:hover {
+    opacity: 1;
+  }
