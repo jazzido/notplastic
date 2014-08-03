@@ -165,6 +165,10 @@ form#notplastic-download-form input#download_code {
   text-align: center;
 }
 
+form#notplastic-download-form input[type=submit]:disabled {
+  opacity: 0.6;
+}
+
 form#notplastic-download-form input[type=submit] {
   display: inline-block;
   -moz-box-shadow: 0px 3px 4px 0px #276873;
