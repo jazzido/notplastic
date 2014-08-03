@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, MetaData
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail
 from flask.ext.assets import Environment
-from flask.ext.superadmin import Admin
+from flask.ext.superadmin import Admin, model as admin_model
 from flask.ext.superadmin.contrib.fileadmin import FileAdmin
 from flask_limiter import Limiter
 from flask_wtf.csrf import CsrfProtect
@@ -68,9 +68,15 @@ def create_app(**config):
 
     return app
 
+class AdminProject(admin_model.ModelAdmin):
+    session = db.session
+    list_display = ('name',)
+    fields = ('name', 'description', 'extended_description', 'amount', 'max_amount', 'suggested_amount', 'max_downloads', 'background_image_url', 'file')
+
+
 def create_admin(app):
     admin = Admin(app, 'Not Plastic')
     from notplastic.notplastic_site import models as np_models
     admin.register(np_models.User, session=db.session)
-    admin.register(np_models.Project, session=db.session)
+    admin.register(np_models.Project, AdminProject)
     admin.add_view(FileAdmin(app.config['PROJECT_FILES_PATH'], 'project_files', name='Project Files'))
