@@ -148,7 +148,25 @@ form#notplastic-payment-form {
 	top:1px;
     }
 
+
+form#notplastic-download-form {
+  width: 40%;
+  margin: 0 auto;
+}
+
+form#notplastic-download-form input#download_code {
+  display: inline-block;
+  height: 60px;
+  font-size: 30px;
+  width: 128px;
+  padding: 0px;
+  vertical-align: middle;
+  margin-right: 11px;
+  text-align: center;
+}
+
 form#notplastic-download-form input[type=submit] {
+  display: inline-block;
   -moz-box-shadow: 0px 3px 4px 0px #276873;
   -webkit-box-shadow: 0px 3px 4px 0px #276873;
   box-shadow: 0px 3px 4px 0px #276873;
@@ -156,7 +174,6 @@ form#notplastic-download-form input[type=submit] {
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
   border-radius: 20px;
-  display: inline-block;
   cursor: pointer;
   color: #FFF;
   font-family: arial;
@@ -164,7 +181,6 @@ form#notplastic-download-form input[type=submit] {
   padding: 16px 31px;
   text-decoration: none;
   text-shadow: 0px 1px 0px #3D768A;
-  display: block;
   margin: 0 auto;
 }
 
