@@ -1,4 +1,4 @@
-import unittest, json
+import unittest, json, os
 
 from flask.ext.testing import TestCase
 from mixer.backend.flask import mixer
@@ -156,7 +156,8 @@ class NPTest(TestCase):
             MERCADOPAGO_CLIENT_ID='foo',
             MERCADOPAGO_CLIENT_SECRET='bar',
             WTF_CSRF_ENABLED=False,
-            DEFAULT_MAIL_SENDER='testing@unabanda.cc'
+            DEFAULT_MAIL_SENDER='testing@unabanda.cc',
+            PROJECT_FILES_PATH='/foo/bar/quux'
         )
         mixer.init_app(self.app)
 
@@ -189,7 +190,9 @@ class NotPlasticSiteTest(NPTest):
 
         assert t.downloaded_at is None
         self.client.get('/p/foo/dl/foobarquux')
-        mock_send_file.assert_called_with(p.file, as_attachment=True)
+        mock_send_file.assert_called_with(os.path.join(self.app.config['PROJECT_FILES_PATH'],
+                                                       p.file),
+                                          as_attachment=True)
         assert t.downloaded_at is not None
 
     @mock.patch('notplastic.notplastic_site.views.send_file')
@@ -207,7 +210,7 @@ class NotPlasticSiteTest(NPTest):
                                 data=dict(download_code='quux'),
                                 follow_redirects=True)
 
-        mock_send_file.assert_called_with(p.file, as_attachment=True)
+        mock_send_file.assert_called_with(os.path.join(self.app.config['PROJECT_FILES_PATH'], p.file), as_attachment=True)
 
     @mock.patch('notplastic.utils.get_MP_client')
     def test_create_payment_preference(self, mock_get_MP_client):
@@ -216,7 +219,8 @@ class NotPlasticSiteTest(NPTest):
         p = mixer.blend(notplastic_site.models.Project,
                         name=u'foo',
                         description=u'quuxor',
-                        file=u'bar')
+                        file=u'bar',
+                        amount=42)
 
         resp = self.client.post('/p/foo/payment',
                                 data=dict(amount=42))
@@ -252,7 +256,8 @@ class NotPlasticSiteTest(NPTest):
         p = mixer.blend(notplastic_site.models.Project,
                         name=u'foo',
                         description=u'quuxor',
-                        file=u'bar')
+                        file=u'bar',
+                        amount=42)
 
         mppp = mixer.blend(notplastic_site.models.MercadoPagoPaymentPreference,
                            project=p,
