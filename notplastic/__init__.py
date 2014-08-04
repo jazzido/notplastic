@@ -56,7 +56,8 @@ def create_app(**config):
 
     Markdown(app)
 
-    create_admin(app)
+    if not app.config.get('TESTING'):
+        create_admin(app)
 
     from notplastic.mercadopago_ipn.views import mod as mp_views
     from notplastic.notplastic_site.views import mod as nps_views
@@ -75,7 +76,7 @@ class AdminProject(admin_model.ModelAdmin):
 
 
 def create_admin(app):
-    admin = Admin(app, 'Not Plastic')
+    admin = Admin(app, 'Not Plastic', '/saracatungacatunga')
     from notplastic.notplastic_site import models as np_models
     admin.register(np_models.User, session=db.session)
     admin.register(np_models.Project, AdminProject)
