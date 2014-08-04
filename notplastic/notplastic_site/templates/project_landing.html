@@ -25,7 +25,7 @@
     {{ payment_form.csrf_token }}
     {% if project.is_variable_price %}
     {% if project.max_amount %}
-    {{ payment_form.amount(min=project.amount|int, max=project.max_amount, value=suggested|int) }}
+    {{ payment_form.amount(min=project.amount|int, max=project.max_amount|int, value=suggested|int) }}
     {% else %}
     {{ payment_form.amount(min=project.amount|int, max=project.amount*2, value=suggested|int) }}
     {% endif %}
@@ -38,8 +38,10 @@
   <p>Si ya tenés un código de descarga, ingresalo aquí.</p>
   <form action="{{url_for('notplastic_site.validate_download_code', project=project.slug)}}" method="post" id="notplastic-download-form">
     {{ download_code_form.csrf_token }}
-    {{ download_code_form.download_code }}
-    <input type="submit" value="Bajar" disabled="disabled">
+    {{ download_code_form.download_code(autocomplete='off') }}
+    <button type="submit" disabled="disabled">Bajar</button>
+    <output for="download_code"></output>
+    <!-- input type="submit" value="Bajar" disabled="disabled"-->
   </form>
 </div>
 {% endblock %}
