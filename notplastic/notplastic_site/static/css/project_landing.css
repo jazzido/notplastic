@@ -196,8 +196,8 @@ form#notplastic-download-form output[for=download_code] {
   display: block;
   margin: 0 auto;
   margin-top: 10px;
-  min-height: 20px;
-  width: 70%;
+  min-height: 22px;
+  width: 80%;
 }
 
 form#notplastic-download-form output[for=download_code].hilite {

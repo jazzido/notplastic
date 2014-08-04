@@ -67,12 +67,13 @@ $(function() {
           msg = 'Se superaron la cantidad de descargas permitidas para el código ingresado';
           break;
           case 429:
-          msg = 'Pará la moto. Demasiados intentos en muy poco tiempo. Volvé a intentar en un rato.';
+          msg = 'Demasiados intentos en muy poco tiempo. Volvé a intentar en un rato.';
           break;
         }
         $('output', self).addClass('hilite').html(msg).delay(1500).queue(function(next) { $(this).removeClass('hilite'); next(); });
         $('#notplastic-download-form input[name=download_code]').val('');
-        $.proxy(sliderInputHandler, $('#notplastic-payment-form input[name=amount]').get(0))();
+        $.proxy(downloadCodeInputHandler, $('#notplastic-download-form input[name=download_code]').get(0))();
+
       },
       success: function(data, status, xhr) {
         msg = 'Gracias! Está comenzando tu descarga';
@@ -82,7 +83,7 @@ $(function() {
         }
         $('output', self).addClass('hilite').html(msg).delay(1500).queue(function(next) { $(this).removeClass('hilite'); next(); });
         $('#notplastic-download-form input[name=download_code]').val('');
-        $.proxy(sliderInputHandler, $('#notplastic-payment-form input[name=amount]').get(0))();
+        $.proxy(downloadCodeInputHandler, $('#notplastic-download-form input[name=download_code]').get(0))();
         window.location.replace(xhr.getResponseHeader('X-Download-URI'));
       }
     });
