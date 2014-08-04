@@ -150,7 +150,8 @@ form#notplastic-payment-form {
 
 
 form#notplastic-download-form {
-  width: 40%;
+  width: 100%;
+  text-align: center;
   margin: 0 auto;
 }
 
@@ -165,12 +166,14 @@ form#notplastic-download-form input#download_code {
   text-align: center;
 }
 
-form#notplastic-download-form input[type=submit]:disabled {
+form#notplastic-download-form input[type=submit]:disabled,
+form#notplastic-download-form button[type=submit]:disabled {
   opacity: 0.6;
 }
 
-form#notplastic-download-form input[type=submit] {
+form#notplastic-download-form input[type=submit], form#notplastic-download-form button[type=submit] {
   display: inline-block;
+  position: relative;
   -moz-box-shadow: 0px 3px 4px 0px #276873;
   -webkit-box-shadow: 0px 3px 4px 0px #276873;
   box-shadow: 0px 3px 4px 0px #276873;
@@ -186,6 +189,29 @@ form#notplastic-download-form input[type=submit] {
   text-decoration: none;
   text-shadow: 0px 1px 0px #3D768A;
   margin: 0 auto;
+  width: 125px; height: 63px;
+}
+
+form#notplastic-download-form output[for=download_code] {
+  display: block;
+  margin: 0 auto;
+  margin-top: 10px;
+  min-height: 20px;
+  width: 70%;
+}
+
+form#notplastic-download-form output[for=download_code].hilite {
+    -webkit-animation: target-fade 1s 1;
+    -moz-animation: target-fade 1s 1;
+}
+
+@-webkit-keyframes target-fade {
+    0% { background-color: rgba(255,255,153,1); }
+    100% { background-color: rgba(255,255,153,0); }
+}
+@-moz-keyframes target-fade {
+    0% { background-color: rgba(255,255,153,1); }
+    100% { background-color: rgba(255,255,153,0); }
 }
 
 #unabanda-logo {

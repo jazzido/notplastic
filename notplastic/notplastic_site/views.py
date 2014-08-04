@@ -31,7 +31,6 @@ def index(project):
 
 @mod.route('/<project>/dl/<ticket>')
 def download(project, ticket):
-
     p = db.session.query(models.Project) \
                   .join(models.DownloadCode) \
                   .join(models.DownloadTicket) \
@@ -87,7 +86,7 @@ def validate_download_code(project):
     used_tickets = c.times_downloaded()
 
     if used_tickets >= c.max_downloads:
-        make_response('', 410) # TODO: fijarse si este status code esta bien
+        return make_response('', 410) # TODO: fijarse si este status code esta bien
 
     # create new ticket and redirect
     t = models.DownloadTicket(download_code=c,
@@ -95,7 +94,15 @@ def validate_download_code(project):
     db.session.add(t)
     db.session.commit()
 
-    return redirect(url_for('.download', project=p.slug, ticket=t.ticket))
+    download_uri = url_for('.download', project=p.slug, ticket=t.ticket, _external=True)
+
+    if request.is_xhr:
+        return make_response('', 200, {
+            'X-Download-URI': download_uri,
+            'X-Remaining-Downloads': c.max_downloads - c.times_downloaded()
+        })
+    else:
+        return redirect(download_uri)
 
 @mod.route('/<project>/payment', methods=['POST'])
 def payment(project):
