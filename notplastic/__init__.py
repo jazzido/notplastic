@@ -12,6 +12,7 @@ from flask_wtf.csrf import CsrfProtect
 from flask.ext.collect import Collect
 from flaskext.markdown import Markdown
 from flask.ext.cdn import CDN
+from flask_bootstrap import Bootstrap
 
 DEV_SERVER_NAME = 'dev.local.unabanda.cc:5000'
 
@@ -31,7 +32,8 @@ DEV_CONFIG = {
     'AUTH0_CLIENT_ID': 'HJl2RIXuBq1022WWqZzJobGZDhw1ciW8',
     'AUTH0_CLIENT_SECRET': 'MMuSbWVL3_PqrDGS-Uamu6_K-G-_Y3osqMrztdtXw_rVxOTR9vlolyjEtJsGigS1',
     'AUTH0_DOMAIN': 'unabanda.auth0.com',
-    'AUTH0_CALLBACK_URL': 'http://%s/auth0/callback' % DEV_SERVER_NAME
+    'AUTH0_CALLBACK_URL': 'http://%s/auth0/callback' % DEV_SERVER_NAME,
+    'BOOTSTRAP_SERVE_LOCAL': True
 }
 
 db = SQLAlchemy()
@@ -41,6 +43,7 @@ csrf = CsrfProtect()
 assets_env = Environment()
 collect = Collect()
 cdn = CDN()
+bootstrap = Bootstrap()
 
 def create_app(**config):
     app = Flask(__name__, static_url_path='')
@@ -53,6 +56,7 @@ def create_app(**config):
     csrf.init_app(app)
 #    collect.init_app(app)
     #cdn.init_app(app)
+    bootstrap.init_app(app)
 
     Markdown(app)
 
@@ -60,12 +64,14 @@ def create_app(**config):
         create_admin(app)
 
     from notplastic.mercadopago_ipn.views import mod as mp_views
+    from notplastic.user_dashboard.views import mod as ud_views
     from notplastic.notplastic_site.views import mod as nps_views
     from notplastic.auth0.views import mod as auth0_views
+
     app.register_blueprint(mp_views)
+    app.register_blueprint(ud_views)
     app.register_blueprint(nps_views)
     app.register_blueprint(auth0_views)
-
 
     return app
 
