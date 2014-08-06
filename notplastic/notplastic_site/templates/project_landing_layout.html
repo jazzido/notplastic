@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    {% block head %}
     <title>{% block project_title %}{% endblock %} — unabanda.cc</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('notplastic_site.static', filename='css/project_landing.css') }}">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,900,300' rel='stylesheet' type='text/css'>
@@ -14,6 +15,7 @@
       }
     </style>
     {% endif %}
+    {% endblock %}
   </head>
   <body>
     <div id="container">
