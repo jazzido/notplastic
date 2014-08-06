@@ -3,7 +3,7 @@
 {% block body %}
 <div id="notplastic-download-content">
   {% if status == 'success' %}
-    <object data="{{ url_for('notplastic_site.static', filename='img/icon_download.svg') }}" type="image/svg+xml" id="icon-download" class="confirmation-icon"></object>
+  <object data="{{ url_for('notplastic_site.static', filename='img/icon_download.svg') }}" type="image/svg+xml" id="icon-download" class="confirmation-icon"></object>
   {% elif status == 'pending' %}
   <object data="{{ url_for('notplastic_site.static', filename='img/icon_wait.svg') }}" type="image/svg+xml" id="icon-pending" class="confirmation-icon"></object>
   {% elif status == 'failure' %}
@@ -11,7 +11,7 @@
   {% endif %}
   {% if status == 'success' %}
   <h1>Gracias!</h1>
-  <p>Ya podés descargar <em>{{project.name}}</em>. También te enviamos al email que ingresaste en <em>MercadoPago</em> un código que te permitirá descargar el material hasta {{ download_code.max_downloads - 1}} veces más.</p>
+  <p>Ya podés descargar <em>{{project.name}}</em>. Con el código de descarga <strong>{{download_code}}</strong>, vas a poder descargar el material hasta {{ download_code.max_downloads - 1}} veces más. Te acabamos de enviar el código a la dirección que ingresaste en <em>MercadoPago</em>; si no lo recibiste, por favor chequeá la carpeta de correo no deseado.</p>
   <form action="{{url_for('notplastic_site.validate_download_code', project=project.slug)}}" method="post" id="notplastic-download-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <input type="hidden" name="download_code" value="{{ download_code }}" />
@@ -19,10 +19,11 @@
   </form>
   {% elif status == 'pending' %}
   <h1>Esperando</h1>
-  <p>Estamos esperando que <em>MercadoPago</em> nos confirme la recepción de tu pago. Si pagaste con tarjeta de crédito o mediante tu cuenta de <em>MercadoPago</em>, vas a recibir por email un código de descarga por email en los próximos minutos. Si elegiste pagar con un cupón o por cajero automático, recibirás tu código cuando completes la operación.</p>
-  <p>Si no recibís el código, por favor escribinos a <strong>compras@unabanda.cc</strong>{% if collection_id and collection_id != 'null' %} mencionando el código de operación {{ collection_id }} {% endif %}.
+  <p>Estamos esperando que <em>MercadoPago</em> nos confirme la recepción de tu pago. Si pagaste con tarjeta de crédito o mediante tu cuenta de <em>MercadoPago</em>, vas a recibir por email un código de descarga por email en los próximos minutos. Si elegiste pagar con un cupón o por cajero automático, recibirás tu código cuando completes la operación y <em>MercadoPago</em> nos informe.</p>
+  <p>Si no recibís el código dentro de los próximos 3 días hábiles, por favor escribinos a <strong>compras@unabanda.cc</strong>{% if collection_id and collection_id != 'null' %} mencionando el número de operación {{ collection_id }} {% endif %}.</p>
   {% elif status == 'failure' %}
-    <h1>Hubo un error</h1>
+  <h1>Hubo un error</h1>
+  <p>Cancelaste el proceso de pago, o hubo un error mientras intentábamos comunicarnos con <em>MercadoPago</em>. Te pedimos que vuelvas a intentar haciendo <a href="{{ url_for('notplastic_site.index', project=project.slug, _external=True) }}">click acá</a>. Si el error persiste, por favor escribinos a <strong>hola@unabanda.cc</strong>.</p>
   {% endif %}
 </div>
 {% endblock body %}

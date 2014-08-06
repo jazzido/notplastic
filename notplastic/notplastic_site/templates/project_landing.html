@@ -1,4 +1,13 @@
 {% extends "project_landing_layout.html" %}
+{% block head %}
+{{ super() }}
+<meta property="twitter:card" content="summary" />
+<meta property="twitter:site" content="@unabandacc" />
+<meta property="twitter:title" content="{{ project.name}}" />
+<meta property="twitter:description" content="¡Bajá '{{ project.name}}' por sólo ${{project.amount|int}}!" />
+<meta property="twitter:image" content="{{ project.background_image_url }}" />
+<meta property="twitter:url" content="{{ url_for('notplastic_site.index', project=project.slug, _external=True) }}" />
+{% endblock %}
 {% block project_title %}{{ project.name }}{% endblock %}
 {% block body %}
 <div id="notplastic-download-content">
