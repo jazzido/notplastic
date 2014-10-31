@@ -15,6 +15,9 @@
       }
     </style>
     {% endif %}
+    {% if project.extra_head_html %}
+    {{ project.extra_head_html|safe }}
+    {% endif %}
     {% endblock %}
   </head>
   <body>

@@ -74,6 +74,7 @@ class Project(db.Model, Sluggable):
     name = db.Column(db.Text(), nullable=False)
     description = db.Column(db.Text())
     extended_description = db.Column(db.Text())
+    extra_head_html = db.Column(db.Text())
     amount = db.Column(db.Numeric(precision=2))
     max_amount = db.Column(db.Numeric(precision=2), nullable=True)
     suggested_amount = db.Column(db.Numeric(precision=2), nullable=True)
