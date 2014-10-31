@@ -72,7 +72,7 @@ def create_app(**config):
 class AdminProject(admin_model.ModelAdmin):
     session = db.session
     list_display = ('name',)
-    fields = ('name', 'description', 'extended_description', 'amount', 'max_amount', 'suggested_amount', 'max_downloads', 'background_image_url', 'file')
+    fields = ('name', 'description', 'extended_description', 'amount', 'max_amount', 'suggested_amount', 'max_downloads', 'background_image_url', 'extra_head_html', 'file')
 
 
 def create_admin(app):
