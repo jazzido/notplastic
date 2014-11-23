@@ -2,10 +2,10 @@ from datetime import datetime
 from urlparse import urlparse
 import os, json
 
-from flask import Blueprint, request, abort, send_file, redirect, url_for, render_template, make_response, session, current_app
+from flask import Blueprint, request, abort, send_file, redirect, url_for, render_template, make_response, session, current_app, jsonify
 from flask.ext.cors import cross_origin
 
-from notplastic import db, limiter, csrf
+from notplastic import db, limiter, csrf, utils
 from notplastic.mercadopago_ipn import models as mp_models
 import models, forms, signal_handlers
 
@@ -14,6 +14,36 @@ mod = Blueprint('notplastic_site',
                 url_prefix='/p',
                 template_folder='templates',
                 static_folder='static')
+
+@mod.route('/oembed')
+def oembed():
+    """ oEmbed endpoint """
+    if request.args.get('url') is None or request.args.get('format') != 'json':
+        abort(400)
+
+    route, params = utils.route_from(request.args['url'])
+
+    project = db.session.query(models.Project) \
+                  .filter(models.Project.slug==params.get('project')) \
+                  .first()
+
+    if project is None:
+        abort(404)
+
+    resp = {
+        'type': 'rich',
+        'version': '1.0',
+        'title': project.name,
+        'provider_name': 'unabanda.cc',
+        'provider_url': 'http://unbanda.cc',
+        'cache_age': 3600,
+        'html': render_template('embed_widget.html',
+                                project=project),
+        'width': '100%',
+        'height': 100
+    }
+
+    return jsonify(**resp)
 
 @mod.route('/<project>')
 def index(project):
