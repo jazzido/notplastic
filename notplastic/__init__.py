@@ -51,7 +51,7 @@ def create_app(**config):
     mail.init_app(app)
     assets_env.init_app(app)
     csrf.init_app(app)
-#    collect.init_app(app)
+    collect.init_app(app)
     #cdn.init_app(app)
 
     Markdown(app)

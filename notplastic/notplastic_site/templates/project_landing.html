@@ -3,7 +3,7 @@
 {{ super() }}
 
 <link rel="alternate" type="application/json+oembed"
-  href="{{ url_for('notplastic_site.oembed', url=url_for('notplastic_site.index', project=project.slug, _external=True), format='json', _external=True) }}"
+  href="{{ url_for('notplastic_site.oembed', url=url_for('notplastic_site.index', project=project.slug, _external=True), _external=True) }}"
   title="{{ project.name }} oembed" />
 <meta property="twitter:card" content="summary" />
 <meta property="twitter:site" content="@unabandacc" />

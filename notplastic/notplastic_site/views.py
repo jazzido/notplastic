@@ -18,7 +18,7 @@ mod = Blueprint('notplastic_site',
 @mod.route('/oembed')
 def oembed():
     """ oEmbed endpoint """
-    if request.args.get('url') is None or request.args.get('format') != 'json':
+    if request.args.get('url') is None:
         abort(400)
 
     route, params = utils.route_from(request.args['url'])
