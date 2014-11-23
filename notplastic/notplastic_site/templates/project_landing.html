@@ -1,6 +1,10 @@
 {% extends "project_landing_layout.html" %}
 {% block head %}
 {{ super() }}
+
+<link rel="alternate" type="application/json+oembed"
+  href="{{ url_for('notplastic_site.oembed', url=url_for('notplastic_site.index', project=project.slug, _external=True), format='json', _external=True) }}"
+  title="{{ project.name }} oembed" />
 <meta property="twitter:card" content="summary" />
 <meta property="twitter:site" content="@unabandacc" />
 <meta property="twitter:title" content="{{ project.name}}" />
