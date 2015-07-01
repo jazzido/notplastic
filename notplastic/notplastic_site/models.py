@@ -143,3 +143,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(), default=func.now())
 
     projects = relationship('Project', lazy='dynamic', backref='user')
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.name, self.email)
+
+
