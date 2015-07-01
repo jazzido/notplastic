@@ -8,9 +8,14 @@
 <meta property="twitter:card" content="summary" />
 <meta property="twitter:site" content="@unabandacc" />
 <meta property="twitter:title" content="{{ project.name}}" />
-<meta property="twitter:description" content="¡Bajá '{{ project.name}}' por sólo ${{project.amount|int}}!" />
+<meta property="twitter:description" content="¡Bajá '{{ project.name}}' por sólo ${{project.suggested_amount|int}}!" />
 <meta property="twitter:image" content="{{ project.background_image_url }}" />
 <meta property="twitter:url" content="{{ url_for('notplastic_site.index', project=project.slug, _external=True) }}" />
+<meta property="og:title" content="unabanda.cc: {{ project.name }}" />
+<meta property="og:description" content="¡Bajá '{{ project.name}}' en unabanda.cc por sólo ${{project.suggested_amount|int}}!" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{{ url_for('notplastic_site.index', project=project.slug, _external=True) }}" />
+<meta property="og:image" content="{{ project.background_image_url }}" />
 {% endblock %}
 {% block project_title %}{{ project.name }}{% endblock %}
 {% block body %}
