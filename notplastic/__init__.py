@@ -76,7 +76,7 @@ class AdminProject(admin_model.ModelAdmin):
 
 
 def create_admin(app):
-    admin = Admin(app, 'Not Plastic', '/saracatungacatunga')
+    admin = Admin(app, 'Not Plastic', '/admin')
     from notplastic.notplastic_site import models as np_models
     admin.register(np_models.User, session=db.session)
     admin.register(np_models.Project, AdminProject)
