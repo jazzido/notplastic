@@ -28,10 +28,7 @@ DEV_CONFIG = {
     'PROJECT_FILES_PATH': os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project_files'),
     'CDN_DOMAIN': DEV_SERVER_NAME,
     'CDN_DEBUG': True,
-    'AUTH0_CLIENT_ID': 'HJl2RIXuBq1022WWqZzJobGZDhw1ciW8',
-    'AUTH0_CLIENT_SECRET': 'MMuSbWVL3_PqrDGS-Uamu6_K-G-_Y3osqMrztdtXw_rVxOTR9vlolyjEtJsGigS1',
-    'AUTH0_DOMAIN': 'unabanda.auth0.com',
-    'AUTH0_CALLBACK_URL': 'http://%s/auth0/callback' % DEV_SERVER_NAME
+    'GOOGLE_ANALYTICS_ID': 'UA-99999-99'
 }
 
 db = SQLAlchemy()
@@ -61,10 +58,8 @@ def create_app(**config):
 
     from notplastic.mercadopago_ipn.views import mod as mp_views
     from notplastic.notplastic_site.views import mod as nps_views
-    from notplastic.auth0.views import mod as auth0_views
     app.register_blueprint(mp_views)
     app.register_blueprint(nps_views)
-    app.register_blueprint(auth0_views)
 
 
     return app

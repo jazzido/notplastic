@@ -31,14 +31,6 @@
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
-    <script src="https://cdn.auth0.com/w2/auth0-widget-5.0.min.js"></script>
-    <script type="text/javascript">
-      var widget = new Auth0Widget({
-          domain:         '{{ config['AUTH0_DOMAIN']}}',
-          clientID:       '{{ config['AUTH0_CLIENT_ID']}}',
-          callbackURL:    '{{ url_for('auth0.callback', _external=True) }}'
-      });
-    </script>
     <!-- button onclick="widget.signin({ scope: 'openid profile' })">Login</button -->
     {% if not config['DEBUG'] %}
     <script>
@@ -47,7 +39,7 @@
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-      ga('create', 'UA-68057-23', 'auto');
+      ga('create', '{{ config['GOOGLE_ANALYTICS_ID'] }}', 'auto');
       ga('require', 'displayfeatures');
       ga('send', 'pageview');
     </script>
