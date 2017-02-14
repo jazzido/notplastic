@@ -27,4 +27,3 @@ Flask-Migrate==1.2.0
 Flask-Markdown==0.3
 Markdown==2.4.1
 Flask-Collect==0.2.3
--e git+https://github.com/jazzido/flask-cdn.git#egg=Flask-CDN

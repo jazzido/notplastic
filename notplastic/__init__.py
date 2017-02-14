@@ -11,7 +11,6 @@ from flask_limiter import Limiter
 from flask_wtf.csrf import CsrfProtect
 from flask.ext.collect import Collect
 from flaskext.markdown import Markdown
-from flask.ext.cdn import CDN
 
 DEV_SERVER_NAME = 'dev.local.unabanda.cc:5000'
 
@@ -26,8 +25,6 @@ DEV_CONFIG = {
     'DOWNLOAD_CODE_LENGTH': 6,
     'DEV': True,
     'PROJECT_FILES_PATH': os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project_files'),
-    'CDN_DOMAIN': DEV_SERVER_NAME,
-    'CDN_DEBUG': True,
     'GOOGLE_ANALYTICS_ID': 'UA-99999-99'
 }
 
@@ -37,7 +34,6 @@ mail = Mail()
 csrf = CsrfProtect()
 assets_env = Environment()
 collect = Collect()
-cdn = CDN()
 
 def create_app(**config):
     app = Flask(__name__, static_url_path='')
@@ -49,7 +45,6 @@ def create_app(**config):
     assets_env.init_app(app)
     csrf.init_app(app)
     collect.init_app(app)
-    #cdn.init_app(app)
 
     Markdown(app)
 
