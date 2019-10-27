@@ -10,7 +10,7 @@ gnureadline==6.3.3
 ipython==2.1.0
 itsdangerous==0.24
 mercadopago==0.2.0
-requests==2.3.0
+requests==2.20.0
 wsgiref==0.1.2
 mock==1.0.1
 mixer==4.7.4
