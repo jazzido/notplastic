@@ -7,7 +7,7 @@ MarkupSafe==0.23
 SQLAlchemy==0.9.6
 Werkzeug==0.15.3
 gnureadline==6.3.3
-ipython==2.1.0
+ipython==7.16.3
 itsdangerous==0.24
 mercadopago==0.2.0
 requests==2.20.0
